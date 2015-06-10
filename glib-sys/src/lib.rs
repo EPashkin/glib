@@ -74,6 +74,9 @@ pub struct GPid;
 #[repr(C)]
 pub struct GPollFD;
 
+#[repr(C)]
+pub struct GFile;
+
 /// Represents a day between January 1, Year 1 and a few thousand years in the future. None of its members should be accessed directly.
 /// 
 /// If the GDate is obtained from g_date_new(), it will be safe to mutate but invalid and thus not safe for calendrical computations.
@@ -466,4 +469,15 @@ extern "C" {
     pub fn g_time_val_add         (time_: *mut c_void, microseconds: c_ulong);
     pub fn g_time_val_from_iso8601(iso_date: *const c_char, time_: *mut c_void);
     pub fn g_time_val_to_iso8601  (time_: *mut c_void) -> *mut c_char;
+
+    //=========================================================================
+    // GFile                                                            NOT ALL
+    //=========================================================================
+    pub fn g_file_get_type        () -> GType;
+    pub fn g_file_new_for_path    (path: *const c_char) -> *mut GFile;
+    pub fn g_file_new_for_uri     (uri: *const c_char) -> *mut GFile;
+
+     pub fn g_file_get_path       (file: *mut GFile) -> *mut c_char;
+     pub fn g_file_get_uri        (file: *mut GFile) -> *mut c_char;
+
 }

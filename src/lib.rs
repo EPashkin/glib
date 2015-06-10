@@ -14,6 +14,7 @@ pub use glib_ffi as ffi;
 use libc::c_char;
 
 pub use self::app_info::AppInfo;
+pub use self::file::File;
 pub use self::list::{List, Elem, RevElem};
 pub use self::slist::{SList, SElem};
 pub use self::glib_container::GlibContainer;
@@ -26,6 +27,7 @@ pub use types::Type;
 pub use self::date::{TimeVal, Time, Date, Year, Month, Weekday, Day};
 
 mod app_info;
+pub mod file;
 mod list;
 mod slist;
 pub mod glib_container;
