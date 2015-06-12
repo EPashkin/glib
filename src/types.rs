@@ -2,7 +2,7 @@
 // See the COPYRIGHT file at the top-level directory of this distribution.
 // Licensed under the MIT license, see the LICENSE file or <http://opensource.org/licenses/MIT>
 
-use translate::{FromGlib, ToGlib, from_glib};
+use translate::{FromGlib, Stash, ToGlib, ToGlibPtr, from_glib};
 use ffi;
 
 /// A GLib or GLib-based library type
@@ -107,6 +107,7 @@ impl FromGlib<ffi::GType> for Type {
 impl ToGlib for Type {
     type GlibType = ffi::GType;
 
+    #[inline]
     fn to_glib(&self) -> ffi::GType {
         use self::Type::*;
         match *self {
@@ -134,5 +135,19 @@ impl ToGlib for Type {
             Variant => ffi::G_TYPE_VARIANT,
             Other(x) => x as ffi::GType,
         }
+    }
+}
+
+impl<'a> ToGlibPtr<'a, ffi::GType> for Type {
+    type Storage = ();
+
+    #[inline]
+    fn to_glib_none(&self) -> Stash<'a, ffi::GType, Type> {
+        Stash(self.to_glib(), ())
+    }
+
+    #[inline]
+    fn to_glib_full(&self) -> ffi::GType {
+        self.to_glib()
     }
 }

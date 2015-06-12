@@ -116,14 +116,42 @@ pub trait ToGlib {
     fn to_glib(&self) -> Self::GlibType;
 }
 
+macro_rules! to_glib_ident {
+    ($t:ty) => (
+        impl ToGlib for $t {
+            type GlibType = $t;
+
+            #[inline]
+            fn to_glib(&self) -> $t {
+                *self
+            }
+        }
+
+        impl<'a> ToGlibPtr<'a, $t> for $t {
+            type Storage = ();
+
+            #[inline]
+            fn to_glib_none(&self) -> Stash<'a, $t, $t> {
+                Stash(*self, ())
+            }
+
+            #[inline]
+            fn to_glib_full(&self) -> $t {
+                *self
+            }
+        }
+    )
+}
+
 impl ToGlib for () {
     type GlibType = ();
 
     #[inline]
-    fn to_glib(&self) -> () {
-        ()
-    }
+    fn to_glib(&self) -> () { () }
 }
+
+//to_glib_ident!(());
+to_glib_ident!(i32);
 
 impl ToGlib for bool {
     type GlibType = ffi::gboolean;
