@@ -7,7 +7,7 @@
 use std::cell::RefCell;
 use std::ops::DerefMut;
 use std::mem::transmute;
-use ffi::{gboolean, gpointer, g_idle_add_full, g_timeout_add_full, g_timeout_add_seconds_full};
+use glib_ffi::{gboolean, gpointer, g_idle_add_full, g_timeout_add_full, g_timeout_add_seconds_full};
 use translate::ToGlib;
 
 /// Return type of idle and timeout functions.
@@ -33,12 +33,10 @@ extern "C" fn trampoline(func: &RefCell<Box<FnMut() -> Continue + 'static>>) -> 
     func.borrow_mut().deref_mut()().to_glib()
 }
 
-extern "C" fn destroy_closure(ptr: gpointer) {
-    unsafe {
-        // Box::from_raw API stability workaround
-        let ptr = ptr as *mut RefCell<Box<FnMut() -> Continue + 'static>>;
-        let _: Box<RefCell<Box<FnMut() -> Continue + 'static>>> = transmute(ptr);
-    }
+unsafe extern "C" fn destroy_closure(ptr: gpointer) {
+    // Box::from_raw API stability workaround
+    let ptr = ptr as *mut RefCell<Box<FnMut() -> Continue + 'static>>;
+    let _: Box<RefCell<Box<FnMut() -> Continue + 'static>>> = transmute(ptr);
 }
 
 const PRIORITY_DEFAULT: i32 = 0;
@@ -66,7 +64,7 @@ pub fn idle_add<F>(func: F) -> u32
     let f: Box<RefCell<Box<FnMut() -> Continue + 'static>>> = Box::new(RefCell::new(Box::new(func)));
     unsafe {
         g_idle_add_full(PRIORITY_DEFAULT_IDLE, transmute(trampoline),
-            into_raw(f) as gpointer, destroy_closure)
+            into_raw(f) as gpointer, Some(destroy_closure))
     }
 }
 
@@ -101,7 +99,7 @@ pub fn timeout_add<F>(interval: u32, func: F) -> u32
     let f: Box<RefCell<Box<FnMut() -> Continue + 'static>>> = Box::new(RefCell::new(Box::new(func)));
     unsafe {
         g_timeout_add_full(PRIORITY_DEFAULT, interval, transmute(trampoline),
-            into_raw(f) as gpointer, destroy_closure)
+            into_raw(f) as gpointer, Some(destroy_closure))
     }
 }
 
@@ -129,6 +127,6 @@ pub fn timeout_add_seconds<F>(interval: u32, func: F) -> u32
     let f: Box<RefCell<Box<FnMut() -> Continue + 'static>>> = Box::new(RefCell::new(Box::new(func)));
     unsafe {
         g_timeout_add_seconds_full(PRIORITY_DEFAULT, interval, transmute(trampoline),
-            into_raw(f) as gpointer, destroy_closure)
+            into_raw(f) as gpointer, Some(destroy_closure))
     }
 }
