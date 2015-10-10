@@ -76,6 +76,24 @@ impl<T: 'static> Ptr for *mut T {
     fn from<X>(ptr: *mut X) -> *mut T { ptr as *mut T }
 }
 
+// a terrible hack to support null-terminated arrays of `c_int` and `GType`
+
+impl Ptr for i32 {
+    #[inline]
+    fn is_null(&self) -> bool { *self == 0 }
+
+    #[inline]
+    fn from<X>(ptr: *mut X) -> i32 { ptr as i32 }
+}
+
+impl Ptr for u64 {
+    #[inline]
+    fn is_null(&self) -> bool { *self == 0 }
+
+    #[inline]
+    fn from<X>(ptr: *mut X) -> u64 { ptr as u64 }
+}
+
 /// Helper type that stores temporary values used for translation.
 ///
 /// `P` is the foreign type pointer and the first element of the tuple.
