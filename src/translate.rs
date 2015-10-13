@@ -86,6 +86,14 @@ impl Ptr for i32 {
     fn from<X>(ptr: *mut X) -> i32 { ptr as i32 }
 }
 
+impl Ptr for u32 {
+    #[inline]
+    fn is_null(&self) -> bool { *self == 0 }
+
+    #[inline]
+    fn from<X>(ptr: *mut X) -> u32 { ptr as u32 }
+}
+
 impl Ptr for u64 {
     #[inline]
     fn is_null(&self) -> bool { *self == 0 }
