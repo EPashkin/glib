@@ -138,6 +138,7 @@ mod list;
 mod slist;
 pub mod glib_container;
 mod error;
+mod quark;
 mod permission;
 pub mod signal;
 pub mod source;
@@ -192,3 +193,5 @@ pub struct ParamSpec {
     value_type: glib_ffi::GType,
     owner_type: glib_ffi::GType,
 }
+
+pub use quark::Quark;
