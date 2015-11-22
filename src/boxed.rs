@@ -21,7 +21,7 @@ macro_rules! glib_boxed_wrapper {
             pub struct $name($crate::boxed::Boxed<$ffi_name, MemoryManager>);
 
         impl $name{
-            glib_boxed_wrapper!(@DECLARE_ACCESSORS $(@fields $fld_accessor_type $fld_conv $func_name $fld_name $fld_type)+);
+            glib_boxed_wrapper!(@DECLARE_ACCESSORS $(@fields $fld_accessor_type $fld_conv $func_name $fld_name $fld_type),+);
         }
 
         glib_boxed_wrapper!(@INTERNALS $name, $ffi_name, @copy $copy_arg $copy_expr,
@@ -93,6 +93,12 @@ macro_rules! glib_boxed_wrapper {
                 $name(self.0.clone())
             }
         }
+    };
+    (@DECLARE_ACCESSORS @fields $fld_accessor_type:ident $fld_conv:ident $func_name:ident $fld_name:ident $fld_type:ty,
+     $(@fields $rest_fld_accessor_type:ident $rest_fld_conv:ident $rest_func_name:ident $rest_fld_name:ident $rest_fld_type:ty),+
+     ) => {
+        glib_boxed_wrapper!(@DECLARE_ACCESSOR $fld_accessor_type $fld_conv $func_name $fld_name $fld_type);
+        glib_boxed_wrapper!(@DECLARE_ACCESSORS $(@fields $rest_fld_accessor_type $rest_fld_conv $rest_func_name $rest_fld_name $rest_fld_type),+);
     };
     (@DECLARE_ACCESSORS @fields $fld_accessor_type:ident $fld_conv:ident $func_name:ident $fld_name:ident $fld_type:ty
      ) => {
