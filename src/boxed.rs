@@ -110,6 +110,14 @@ macro_rules! glib_boxed_wrapper {
             self.0.as_ref().$fld_name
         }
     };
+    (@DECLARE_ACCESSOR get pointer $func_name:ident $fld_name:ident $fld_type:ty
+     ) => {
+        pub fn $func_name(&self) -> $fld_type {
+            unsafe {
+                from_glib_none(self.0.as_ref().$fld_name)
+            }
+        }
+    };
 }
 
 enum AnyBox<T> {
