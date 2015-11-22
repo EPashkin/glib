@@ -10,6 +10,25 @@ macro_rules! glib_boxed_wrapper {
         $(#[$attr])*
         pub struct $name($crate::boxed::Boxed<$ffi_name, MemoryManager>);
 
+        glib_boxed_wrapper!(@INTERNALS $name, $ffi_name, @copy $copy_arg $copy_expr,
+            @free $free_arg $free_expr);
+    };
+    ([$($attr:meta)*] $name:ident, $ffi_name:path,
+     $(@fields $fld_accessor_type:ident $fld_conv:ident $func_name:ident $fld_name:ident $fld_type:ty,)+
+     @copy $copy_arg:ident $copy_expr:expr,
+     @free $free_arg:ident $free_expr:expr) => {
+        $(#[$attr])*
+            pub struct $name($crate::boxed::Boxed<$ffi_name, MemoryManager>);
+
+        impl $name{
+            glib_boxed_wrapper!(@DECLARE_ACCESSORS $(@fields $fld_accessor_type $fld_conv $func_name $fld_name $fld_type)+);
+        }
+
+        glib_boxed_wrapper!(@INTERNALS $name, $ffi_name, @copy $copy_arg $copy_expr,
+            @free $free_arg $free_expr);
+    };
+    (@INTERNALS $name:ident, $ffi_name:path, @copy $copy_arg:ident $copy_expr:expr,
+     @free $free_arg:ident $free_expr:expr) => {
         #[doc(hidden)]
         pub struct MemoryManager;
 
@@ -74,7 +93,17 @@ macro_rules! glib_boxed_wrapper {
                 $name(self.0.clone())
             }
         }
-    }
+    };
+    (@DECLARE_ACCESSORS @fields $fld_accessor_type:ident $fld_conv:ident $func_name:ident $fld_name:ident $fld_type:ty
+     ) => {
+        glib_boxed_wrapper!(@DECLARE_ACCESSOR $fld_accessor_type $fld_conv $func_name $fld_name $fld_type);
+    };
+    (@DECLARE_ACCESSOR get direct $func_name:ident $fld_name:ident $fld_type:ty
+     ) => {
+        pub fn $func_name(&self) -> $fld_type {
+            self.0.as_ref().$fld_name
+        }
+    };
 }
 
 enum AnyBox<T> {
@@ -95,6 +124,17 @@ pub trait BoxedMemoryManager<T>: 'static {
 pub struct Boxed<T: 'static, MM: BoxedMemoryManager<T>> {
     inner: AnyBox<T>,
     _dummy: PhantomData<MM>,
+}
+
+impl<T: 'static, MM: BoxedMemoryManager<T>> AsRef<T> for Boxed<T, MM> {
+    #[inline]
+    fn as_ref(&self) -> &T {
+        use self::AnyBox::*;
+        match self.inner {
+            Native(ref b) => b,
+            ForeignOwned(p) | ForeignBorrowed(p) => unsafe{&*p},
+        }
+    }
 }
 
 impl<T: 'static, MM: BoxedMemoryManager<T>> Boxed<T, MM> {

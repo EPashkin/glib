@@ -106,6 +106,25 @@ macro_rules! glib_wrapper {
 
     (
         $(#[$attr:meta])*
+        pub struct $name:ident(Boxed<$ffi_name:path>);
+
+        fields {
+            $($fld_accessor_type:ident $fld_conv:ident ($func_name:ident) $fld_name:ident : $fld_type:ty,)+
+        }
+
+        match fn {
+            copy => |$copy_arg:ident| $copy_expr:expr,
+            free => |$free_arg:ident| $free_expr:expr,
+        }
+    ) => {
+        glib_boxed_wrapper!([$($attr)*] $name, $ffi_name,
+            $(@fields $fld_accessor_type $fld_conv $func_name $fld_name $fld_type,)+
+            @copy $copy_arg $copy_expr,
+            @free $free_arg $free_expr);
+    };
+
+    (
+        $(#[$attr:meta])*
         pub struct $name:ident(Object<$ffi_name:path>);
 
         match fn {
