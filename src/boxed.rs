@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 use std::mem;
+use std::ops::Deref;
 use translate::*;
 
 /// Wrapper implementations for Boxed types. See `glib_wrapper!`.
@@ -107,14 +108,14 @@ macro_rules! glib_boxed_wrapper {
     (@DECLARE_ACCESSOR get direct $func_name:ident $fld_name:ident $fld_type:ty
      ) => {
         pub fn $func_name(&self) -> $fld_type {
-            self.0.as_ref().$fld_name
+            (self.0).$fld_name
         }
     };
     (@DECLARE_ACCESSOR get pointer $func_name:ident $fld_name:ident $fld_type:ty
      ) => {
         pub fn $func_name(&self) -> $fld_type {
             unsafe {
-                from_glib_none(self.0.as_ref().$fld_name)
+                from_glib_none((self.0).$fld_name)
             }
         }
     };
@@ -140,9 +141,11 @@ pub struct Boxed<T: 'static, MM: BoxedMemoryManager<T>> {
     _dummy: PhantomData<MM>,
 }
 
-impl<T: 'static, MM: BoxedMemoryManager<T>> AsRef<T> for Boxed<T, MM> {
+impl<T: 'static, MM: BoxedMemoryManager<T>> Deref for Boxed<T, MM> {
+    type Target = T;
+
     #[inline]
-    fn as_ref(&self) -> &T {
+    fn deref(&self) -> &T {
         use self::AnyBox::*;
         match self.inner {
             Native(ref b) => b,
