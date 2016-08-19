@@ -14,6 +14,7 @@ keywords = ["glib", "gtk-rs", "gnome", "GUI"]
 name = "glib"
 
 [dependencies]
+bitflags = "0.5"
 libc = "0.2"
 
 [dependencies.gio-sys]

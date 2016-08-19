@@ -71,6 +71,8 @@
 //! conversions between high level Rust types (including the aforementioned
 //! wrappers) and their FFI counterparts.
 
+#[macro_use]
+extern crate bitflags;
 extern crate libc;
 extern crate glib_sys as glib_ffi;
 extern crate gobject_sys as gobject_ffi;
@@ -129,6 +131,10 @@ pub mod boxed;
 pub mod shared;
 #[macro_use]
 pub mod object;
+
+pub use auto::*;
+
+mod auto;
 
 mod bytes;
 pub mod error;
