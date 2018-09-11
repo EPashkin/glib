@@ -25,8 +25,8 @@ lazy_static = "1.0"
 libc = "0.2"
 bitflags = "1.0"
 futures-preview = { version = "0.2", optional = true }
-glib-sys = { git = "https://github.com/gtk-rs/sys" }
-gobject-sys = { git = "https://github.com/gtk-rs/sys" }
+glib-sys = "0.7.0"
+gobject-sys = "0.7.0"
 
 [dev-dependencies]
 tempdir = "0.3"
@@ -45,3 +45,7 @@ v2_54 = ["v2_52", "glib-sys/v2_54", "gobject-sys/v2_54"]
 v2_56 = ["v2_54", "glib-sys/v2_56"]
 futures = ["futures-preview", "v2_36"]
 dox = ["glib-sys/dox", "gobject-sys/dox"]
+
+[patch.crates-io]
+glib-sys = { git = "https://github.com/EPashkin/rust-gnome-sys" }
+gobject-sys = { git = "https://github.com/EPashkin/rust-gnome-sys" }
