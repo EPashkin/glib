@@ -55,7 +55,7 @@ script:
   - cargo test
   - rustc --version
   - mkdir .cargo
-  - echo 'paths = ["."]' > .cargo/config
-  - git clone -q --depth 50 -b pending https://github.com/rust-gnome/examples _examples
+  - git clone -q --depth 50 -b pending https://github.com/EPashkin/examples _examples
   - cd _examples
+  - python3 replace_patchs.py glib
   - ./build_travis.sh
