@@ -45,6 +45,7 @@ v2_54 = ["v2_52", "glib-sys/v2_54", "gobject-sys/v2_54"]
 v2_56 = ["v2_54", "glib-sys/v2_56"]
 futures = ["futures-preview", "v2_36"]
 dox = ["glib-sys/dox", "gobject-sys/dox"]
+fake = []
 
 [patch.crates-io]
 glib-sys = { git = "https://github.com/EPashkin/rust-gnome-sys" }
